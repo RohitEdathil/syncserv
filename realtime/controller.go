@@ -15,6 +15,6 @@ func AttachController(ctx *gin.Context) {
 		error_handling.PanicHTTP(error_handling.InvalidRequest, "id and secret are required")
 	}
 
-	AttachTypeSync(id, secret)
+	AttachTypeSync(id, secret, ctx)
 
 }
