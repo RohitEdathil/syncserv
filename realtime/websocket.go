@@ -1,7 +1,8 @@
 package realtime
 
 import (
-	"fmt"
+	"log"
+	"net/http"
 	"syncserv/code"
 	e "syncserv/error_handling"
 
@@ -12,6 +13,11 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+
+	// Allow all origins
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func AttachTypeSync(id string, secret string, ctx *gin.Context) {
@@ -19,7 +25,7 @@ func AttachTypeSync(id string, secret string, ctx *gin.Context) {
 	sharer, found := code.SyncStoreInstance.Get(id)
 
 	if !found {
-		e.PanicHTTP(e.InvalidRequest, "Sharer not found")
+		e.PanicHTTP(e.BadRequest, "Sharer not found")
 	}
 
 	if sharer.Secret != secret {
@@ -29,10 +35,30 @@ func AttachTypeSync(id string, secret string, ctx *gin.Context) {
 	connection, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 
 	if err != nil {
-		e.PanicHTTP(e.InvalidRequest, "Could not upgrade connection")
+		e.PanicHTTP(e.BadRequest, err.Error())
 	}
 
 	sharer.Connection = connection
+	go startListening(sharer)
 
-	fmt.Println("AttachTypeSync", id, secret)
+}
+
+func startListening(sync *code.TypeSync) {
+
+	for {
+		message := Message{}
+		err := sync.Connection.ReadJSON(&message)
+
+		if err != nil {
+			e.PanicWS(*sync.Connection, err.Error())
+			sync.Connection.Close()
+			break
+		}
+
+		log.Println("Message received", message)
+	}
+
+	log.Printf("Disconnected")
+	sync.Connection = nil
+
 }

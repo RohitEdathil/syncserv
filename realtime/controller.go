@@ -12,7 +12,7 @@ func AttachController(ctx *gin.Context) {
 	secret := ctx.Query("secret")
 
 	if id == "" || secret == "" {
-		error_handling.PanicHTTP(error_handling.InvalidRequest, "id and secret are required")
+		error_handling.PanicHTTP(error_handling.BadRequest, "id and secret are required")
 	}
 
 	AttachTypeSync(id, secret, ctx)
