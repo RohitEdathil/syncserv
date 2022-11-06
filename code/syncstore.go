@@ -1,7 +1,6 @@
 package code
 
 import (
-	"log"
 	"syncserv/util"
 
 	"github.com/google/uuid"
@@ -38,7 +37,6 @@ func (s *SyncStore) CreateNew() *TypeSync {
 		Secret: uuid.NewString(),
 	}
 	s.Count++
-	log.Println(s.data)
 	return s.data[id]
 }
 
