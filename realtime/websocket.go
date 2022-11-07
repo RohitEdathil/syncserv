@@ -38,12 +38,14 @@ func AttachTypeSync(id string, secret string, ctx *gin.Context) {
 		e.PanicHTTP(e.BadRequest, err.Error())
 	}
 
-	sharer.Connection = connection
-	go startListening(sharer)
+	go startListening(sharer, connection)
 
 }
 
-func startListening(sync *code.TypeSync) {
+func startListening(sync *code.TypeSync, conn *websocket.Conn) {
+
+	sync.Lock.Lock()
+	sync.Connection = conn
 
 	for {
 		message := Message{}
@@ -60,5 +62,6 @@ func startListening(sync *code.TypeSync) {
 
 	log.Printf("Disconnected")
 	sync.Connection = nil
+	sync.Lock.Unlock()
 
 }
