@@ -1,13 +1,13 @@
 package main
 
 import (
-	"syncserv/code"
+	"syncserv/clients"
 	"syncserv/realtime"
 
 	"github.com/gin-gonic/gin"
 )
 
 func registerRoutes(router *gin.RouterGroup) {
-	code.Register(router)
+	clients.Register(router)
 	realtime.Register(router)
 }

@@ -1,4 +1,4 @@
-package code
+package clients
 
 import (
 	"log"
@@ -11,7 +11,7 @@ import (
 
 type Listener struct {
 	id         int
-	Of         *TypeSync
+	Of         *Broadcaster
 	Connection *websocket.Conn
 	Lock       *sync.Mutex
 }

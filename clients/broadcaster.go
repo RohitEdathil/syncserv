@@ -1,4 +1,4 @@
-package code
+package clients
 
 import (
 	"log"
@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type TypeSync struct {
+type Broadcaster struct {
 	Id         string
 	Secret     string
 	Connection *websocket.Conn
@@ -19,7 +19,7 @@ type TypeSync struct {
 	count      int
 }
 
-func (sync *TypeSync) StartListening(conn *websocket.Conn) {
+func (sync *Broadcaster) StartListening(conn *websocket.Conn) {
 
 	sync.Lock.Lock()
 	sync.Connection = conn
@@ -46,7 +46,7 @@ func (sync *TypeSync) StartListening(conn *websocket.Conn) {
 
 }
 
-func (sync *TypeSync) AddListener(listener *Listener) {
+func (sync *Broadcaster) AddListener(listener *Listener) {
 	// Entry
 	sync.Lock.Lock()
 	listener.Lock.Lock()
@@ -61,7 +61,7 @@ func (sync *TypeSync) AddListener(listener *Listener) {
 	listener.Lock.Unlock()
 }
 
-func (sync *TypeSync) RemoveListener(listener *Listener) {
+func (sync *Broadcaster) RemoveListener(listener *Listener) {
 	sync.Lock.Lock()
 	delete(sync.Listeners, listener.id)
 	sync.Lock.Unlock()

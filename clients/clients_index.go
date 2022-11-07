@@ -1,4 +1,4 @@
-package code
+package clients
 
 import (
 	"sync"
@@ -8,16 +8,16 @@ import (
 )
 
 // Holds all the TypeSyncs
-type SyncStore struct {
+type ClientsIndex struct {
 	Count int
-	data  map[string]*TypeSync
+	data  map[string]*Broadcaster
 }
 
 // Global SyncStore instance
-var SyncStoreInstance = SyncStore{0, make(map[string]*TypeSync)}
+var SyncStoreInstance = ClientsIndex{0, make(map[string]*Broadcaster)}
 
 // Returns a unique id
-func (s *SyncStore) uniqueId() string {
+func (s *ClientsIndex) uniqueId() string {
 	id := util.RandString(5)
 
 	_, ok := s.data[id]
@@ -29,11 +29,11 @@ func (s *SyncStore) uniqueId() string {
 }
 
 // Creates a new TypeSync
-func (s *SyncStore) CreateNew() *TypeSync {
+func (s *ClientsIndex) CreateNew() *Broadcaster {
 
 	id := s.uniqueId()
 
-	s.data[id] = &TypeSync{
+	s.data[id] = &Broadcaster{
 		Id:        id,
 		Secret:    uuid.NewString(),
 		Lock:      &sync.Mutex{},
@@ -44,13 +44,13 @@ func (s *SyncStore) CreateNew() *TypeSync {
 }
 
 // Returns a TypeSync by id
-func (s *SyncStore) Get(id string) (*TypeSync, bool) {
+func (s *ClientsIndex) Get(id string) (*Broadcaster, bool) {
 	sharer, found := s.data[id]
 	return sharer, found
 }
 
 // Deletes a TypeSync by id
-func (s *SyncStore) Delete(id string) {
+func (s *ClientsIndex) Delete(id string) {
 	delete(s.data, id)
 	s.Count--
 }

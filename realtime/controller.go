@@ -3,7 +3,7 @@ package realtime
 import (
 	"log"
 	"sync"
-	"syncserv/code"
+	"syncserv/clients"
 	e "syncserv/error_handling"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ func AttachController(ctx *gin.Context) {
 		e.PanicHTTP(e.BadRequest, "id and secret are required")
 	}
 
-	sharer, found := code.SyncStoreInstance.Get(id)
+	sharer, found := clients.SyncStoreInstance.Get(id)
 
 	if !found {
 		e.PanicHTTP(e.BadRequest, "Sharer not found")
@@ -46,7 +46,7 @@ func ListenController(ctx *gin.Context) {
 		e.PanicHTTP(e.BadRequest, "id is required")
 	}
 
-	sharer, found := code.SyncStoreInstance.Get(id)
+	sharer, found := clients.SyncStoreInstance.Get(id)
 
 	if !found {
 		e.PanicHTTP(e.BadRequest, "Sharer not found")
@@ -59,7 +59,7 @@ func ListenController(ctx *gin.Context) {
 		e.PanicHTTP(e.BadRequest, err.Error())
 	}
 
-	listener := code.Listener{
+	listener := clients.Listener{
 		Of:         sharer,
 		Connection: connection,
 		Lock:       &sync.Mutex{},
