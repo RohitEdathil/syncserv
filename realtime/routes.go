@@ -7,4 +7,6 @@ func Register(router *gin.RouterGroup) {
 
 	router.GET("attach/:id", AttachController)
 
+	router.GET("listen/:id", ListenController)
+
 }

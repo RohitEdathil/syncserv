@@ -15,7 +15,6 @@ type TypeSync struct {
 	Secret     string
 	Connection *websocket.Conn
 	Lock       sync.Mutex
-	Channel    <-chan interface{}
 	Listeners  []Listener
 }
 
@@ -23,6 +22,7 @@ func (sync *TypeSync) StartListening(conn *websocket.Conn) {
 
 	sync.Lock.Lock()
 	sync.Connection = conn
+	sync.Lock.Unlock()
 
 	for {
 		message := util.Message{}
@@ -34,11 +34,19 @@ func (sync *TypeSync) StartListening(conn *websocket.Conn) {
 			break
 		}
 
-		log.Println("Message received", message)
+		log.Printf("Message received from %s : %s", sync.Connection.RemoteAddr(), message)
 	}
 
 	log.Printf("Disconnected")
+
+	sync.Lock.Lock()
 	sync.Connection = nil
 	sync.Lock.Unlock()
 
+}
+
+func (sync *TypeSync) AddListener(listener Listener) {
+	sync.Lock.Lock()
+	sync.Listeners = append(sync.Listeners, listener)
+	sync.Lock.Unlock()
 }
