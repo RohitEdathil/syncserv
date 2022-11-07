@@ -14,6 +14,8 @@ type Listener struct {
 	Of         *Broadcaster
 	Connection *websocket.Conn
 	Lock       *sync.Mutex
+
+	Handler func(listener *Listener, message *util.Message)
 }
 
 func (listener *Listener) StartListening(conn *websocket.Conn) {
@@ -33,6 +35,7 @@ func (listener *Listener) StartListening(conn *websocket.Conn) {
 		}
 
 		log.Printf("Message received from %s : %s", listener.Connection.RemoteAddr(), message)
+		listener.Handler(listener, &message)
 	}
 
 	log.Printf("Disconnected")

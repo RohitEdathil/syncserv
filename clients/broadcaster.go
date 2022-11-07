@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	e "syncserv/error_handling"
+
 	"syncserv/util"
 
 	"github.com/gorilla/websocket"
@@ -17,52 +18,55 @@ type Broadcaster struct {
 	Lock       *sync.Mutex
 	Listeners  map[int]Listener
 	count      int
+
+	Handler func(broadcaster *Broadcaster, message *util.Message)
 }
 
-func (sync *Broadcaster) StartListening(conn *websocket.Conn) {
+func (broadcaster *Broadcaster) StartListening(conn *websocket.Conn) {
 
-	sync.Lock.Lock()
-	sync.Connection = conn
-	sync.Lock.Unlock()
+	broadcaster.Lock.Lock()
+	broadcaster.Connection = conn
+	broadcaster.Lock.Unlock()
 
 	for {
 		message := util.Message{}
-		err := sync.Connection.ReadJSON(&message)
+		err := broadcaster.Connection.ReadJSON(&message)
 
 		if err != nil {
-			e.PanicWS(*sync.Connection, err.Error())
-			sync.Connection.Close()
+			e.PanicWS(*broadcaster.Connection, err.Error())
+			broadcaster.Connection.Close()
 			break
 		}
 
-		log.Printf("Message received from %s : %s", sync.Connection.RemoteAddr(), message)
+		log.Printf("Message received from %s : %s", broadcaster.Connection.RemoteAddr(), message)
+		broadcaster.Handler(broadcaster, &message)
 	}
 
 	log.Printf("Disconnected")
 
-	sync.Lock.Lock()
-	sync.Connection = nil
-	sync.Lock.Unlock()
+	broadcaster.Lock.Lock()
+	broadcaster.Connection = nil
+	broadcaster.Lock.Unlock()
 
 }
 
-func (sync *Broadcaster) AddListener(listener *Listener) {
+func (broadcaster *Broadcaster) AddListener(listener *Listener) {
 	// Entry
-	sync.Lock.Lock()
+	broadcaster.Lock.Lock()
 	listener.Lock.Lock()
 
 	// Critical
-	listener.id = sync.count
-	sync.Listeners[sync.count] = *listener
-	sync.count++
+	listener.id = broadcaster.count
+	broadcaster.Listeners[broadcaster.count] = *listener
+	broadcaster.count++
 
 	// Exit
-	sync.Lock.Unlock()
+	broadcaster.Lock.Unlock()
 	listener.Lock.Unlock()
 }
 
-func (sync *Broadcaster) RemoveListener(listener *Listener) {
-	sync.Lock.Lock()
-	delete(sync.Listeners, listener.id)
-	sync.Lock.Unlock()
+func (broadcaster *Broadcaster) RemoveListener(listener *Listener) {
+	broadcaster.Lock.Lock()
+	delete(broadcaster.Listeners, listener.id)
+	broadcaster.Lock.Unlock()
 }

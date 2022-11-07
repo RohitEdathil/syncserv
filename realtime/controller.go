@@ -3,8 +3,10 @@ package realtime
 import (
 	"log"
 	"sync"
-	"syncserv/clients"
 	e "syncserv/error_handling"
+	"syncserv/mapper"
+
+	"syncserv/clients"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,6 +36,8 @@ func AttachController(ctx *gin.Context) {
 		log.Println(err)
 		e.PanicHTTP(e.BadRequest, err.Error())
 	}
+
+	sharer.Handler = mapper.HandleBroadcasterMessage
 
 	go sharer.StartListening(connection)
 
@@ -66,6 +70,8 @@ func ListenController(ctx *gin.Context) {
 	}
 
 	sharer.AddListener(&listener)
+
+	listener.Handler = mapper.HandleListenerMessage
 
 	go listener.StartListening(connection)
 
