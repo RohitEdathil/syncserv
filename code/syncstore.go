@@ -34,9 +34,10 @@ func (s *SyncStore) CreateNew() *TypeSync {
 	id := s.uniqueId()
 
 	s.data[id] = &TypeSync{
-		Id:     id,
-		Secret: uuid.NewString(),
-		Lock:   sync.Mutex{},
+		Id:        id,
+		Secret:    uuid.NewString(),
+		Lock:      &sync.Mutex{},
+		Listeners: map[int]Listener{},
 	}
 	s.Count++
 	return s.data[id]

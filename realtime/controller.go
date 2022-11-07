@@ -2,6 +2,7 @@ package realtime
 
 import (
 	"log"
+	"sync"
 	"syncserv/code"
 	e "syncserv/error_handling"
 
@@ -61,10 +62,11 @@ func ListenController(ctx *gin.Context) {
 	listener := code.Listener{
 		Of:         sharer,
 		Connection: connection,
+		Lock:       &sync.Mutex{},
 	}
 
-	sharer.AddListener(listener)
+	sharer.AddListener(&listener)
 
-	go listener.StartListening()
+	go listener.StartListening(connection)
 
 }

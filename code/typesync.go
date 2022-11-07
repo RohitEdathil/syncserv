@@ -14,8 +14,9 @@ type TypeSync struct {
 	Id         string
 	Secret     string
 	Connection *websocket.Conn
-	Lock       sync.Mutex
-	Listeners  []Listener
+	Lock       *sync.Mutex
+	Listeners  map[int]Listener
+	count      int
 }
 
 func (sync *TypeSync) StartListening(conn *websocket.Conn) {
@@ -45,8 +46,23 @@ func (sync *TypeSync) StartListening(conn *websocket.Conn) {
 
 }
 
-func (sync *TypeSync) AddListener(listener Listener) {
+func (sync *TypeSync) AddListener(listener *Listener) {
+	// Entry
 	sync.Lock.Lock()
-	sync.Listeners = append(sync.Listeners, listener)
+	listener.Lock.Lock()
+
+	// Critical
+	listener.id = sync.count
+	sync.Listeners[sync.count] = *listener
+	sync.count++
+
+	// Exit
+	sync.Lock.Unlock()
+	listener.Lock.Unlock()
+}
+
+func (sync *TypeSync) RemoveListener(listener *Listener) {
+	sync.Lock.Lock()
+	delete(sync.Listeners, listener.id)
 	sync.Lock.Unlock()
 }
