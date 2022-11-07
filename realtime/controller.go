@@ -8,7 +8,7 @@ import (
 
 func AttachController(ctx *gin.Context) {
 
-	id := ctx.Query("id")
+	id := ctx.Param("id")
 	secret := ctx.Query("secret")
 
 	if id == "" || secret == "" {
