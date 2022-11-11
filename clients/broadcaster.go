@@ -48,6 +48,11 @@ func (broadcaster *Broadcaster) StartListening(conn *websocket.Conn) {
 	broadcaster.Connection = nil
 	broadcaster.Lock.Unlock()
 
+	if len(broadcaster.Listeners) == 0 {
+		log.Printf("No more listeners, closing broadcaster")
+		ClientIndexInstance.Delete(broadcaster.Id)
+	}
+
 }
 
 func (broadcaster *Broadcaster) AddListener(listener *Listener) {

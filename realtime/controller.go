@@ -20,7 +20,7 @@ func AttachController(ctx *gin.Context) {
 		e.PanicHTTP(e.BadRequest, "id and secret are required")
 	}
 
-	sharer, found := clients.SyncStoreInstance.Get(id)
+	sharer, found := clients.ClientIndexInstance.Get(id)
 
 	if !found {
 		e.PanicHTTP(e.BadRequest, "Sharer not found")
@@ -50,7 +50,7 @@ func ListenController(ctx *gin.Context) {
 		e.PanicHTTP(e.BadRequest, "id is required")
 	}
 
-	sharer, found := clients.SyncStoreInstance.Get(id)
+	sharer, found := clients.ClientIndexInstance.Get(id)
 
 	if !found {
 		e.PanicHTTP(e.BadRequest, "Sharer not found")

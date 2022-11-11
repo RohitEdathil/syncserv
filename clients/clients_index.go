@@ -11,10 +11,11 @@ import (
 type ClientsIndex struct {
 	Count int
 	data  map[string]*Broadcaster
+	Lock  *sync.Mutex
 }
 
 // Global SyncStore instance
-var SyncStoreInstance = ClientsIndex{0, make(map[string]*Broadcaster)}
+var ClientIndexInstance = ClientsIndex{0, make(map[string]*Broadcaster), &sync.Mutex{}}
 
 // Returns a unique id
 func (s *ClientsIndex) uniqueId() string {
@@ -33,6 +34,7 @@ func (s *ClientsIndex) CreateNew() *Broadcaster {
 
 	id := s.uniqueId()
 
+	s.Lock.Lock()
 	s.data[id] = &Broadcaster{
 		Id:        id,
 		Secret:    uuid.NewString(),
@@ -40,17 +42,22 @@ func (s *ClientsIndex) CreateNew() *Broadcaster {
 		Listeners: map[int]Listener{},
 	}
 	s.Count++
+	s.Lock.Unlock()
 	return s.data[id]
 }
 
 // Returns a TypeSync by id
 func (s *ClientsIndex) Get(id string) (*Broadcaster, bool) {
+	s.Lock.Lock()
 	sharer, found := s.data[id]
+	s.Lock.Unlock()
 	return sharer, found
 }
 
 // Deletes a TypeSync by id
 func (s *ClientsIndex) Delete(id string) {
+	s.Lock.Lock()
 	delete(s.data, id)
 	s.Count--
+	s.Lock.Unlock()
 }
