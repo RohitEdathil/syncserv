@@ -46,6 +46,14 @@ func (s *ClientsIndex) CreateNew() *Broadcaster {
 	return s.data[id]
 }
 
+// Checks if a TypeSync exists
+func (s *ClientsIndex) CheckId(id string) bool {
+	s.Lock.Lock()
+	_, ok := s.data[id]
+	s.Lock.Unlock()
+	return ok
+}
+
 // Returns a TypeSync by id
 func (s *ClientsIndex) Get(id string) (*Broadcaster, bool) {
 	s.Lock.Lock()

@@ -11,3 +11,14 @@ func NewController(ctx *gin.Context) {
 		"secret": newsync.Secret,
 	})
 }
+
+func CheckIdController(ctx *gin.Context) {
+
+	id := ctx.Param("id")
+
+	if ClientIndexInstance.CheckId(id) {
+		ctx.JSON(200, nil)
+	} else {
+		ctx.JSON(404, nil)
+	}
+}
