@@ -6,6 +6,7 @@ import (
 	"syncserv/util"
 )
 
+// Maps a message type to a handler
 func HandleListenerMessage(listener *clients.Listener, message *util.Message) {
 
 	switch message.Type {

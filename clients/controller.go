@@ -16,6 +16,7 @@ func CheckIdController(ctx *gin.Context) {
 
 	id := ctx.Param("id")
 
+	// Return 404 if not found 200 if found, no data payload
 	if ClientIndexInstance.CheckId(id) {
 		ctx.JSON(200, nil)
 	} else {

@@ -9,6 +9,7 @@ func CorsMiddleware() gin.HandlerFunc {
 
 	config := cors.DefaultConfig()
 
+	// Allow all origins
 	config.AllowOrigins = []string{"*"}
 
 	return cors.New(config)

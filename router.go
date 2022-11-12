@@ -8,6 +8,8 @@ import (
 )
 
 func registerRoutes(router *gin.RouterGroup) {
+
+	// Routes from each package
 	clients.Register(router)
 	realtime.Register(router)
 }

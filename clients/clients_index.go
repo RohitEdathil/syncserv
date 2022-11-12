@@ -14,7 +14,7 @@ type ClientsIndex struct {
 	Lock  *sync.Mutex
 }
 
-// Global SyncStore instance
+// Global ClientsIndex instance
 var ClientIndexInstance = ClientsIndex{0, make(map[string]*Broadcaster), &sync.Mutex{}}
 
 // Returns a unique id
@@ -32,8 +32,10 @@ func (s *ClientsIndex) uniqueId() string {
 // Creates a new TypeSync
 func (s *ClientsIndex) CreateNew() *Broadcaster {
 
+	// Obtain a unique id
 	id := s.uniqueId()
 
+	// Creating new Broadcaster
 	s.Lock.Lock()
 	s.data[id] = &Broadcaster{
 		Id:        id,
@@ -43,6 +45,7 @@ func (s *ClientsIndex) CreateNew() *Broadcaster {
 	}
 	s.Count++
 	s.Lock.Unlock()
+
 	return s.data[id]
 }
 

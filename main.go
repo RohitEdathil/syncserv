@@ -11,13 +11,15 @@ import (
 func main() {
 	serv := gin.Default()
 
+	// Initializing stuff
 	logging.Setup()
+	serv.SetTrustedProxies(nil)
 
+	// Middleware
 	serv.Use(error_handling.ErrorInterceptor)
 	serv.Use(cors.CorsMiddleware())
 
-	serv.SetTrustedProxies(nil)
-
+	// Routing entry point
 	registerRoutes(serv.Group("/api"))
 
 	serv.Run(":8080")
