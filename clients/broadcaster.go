@@ -50,7 +50,7 @@ func (broadcaster *Broadcaster) StartListening(conn *websocket.Conn) {
 		}
 
 		// Handling message
-		log.Printf("Message received from %s : %s", broadcaster.Connection.RemoteAddr(), message)
+		log.Printf("Message received from %s", broadcaster.Connection.RemoteAddr())
 		broadcaster.Handler(broadcaster, &message)
 	}
 
