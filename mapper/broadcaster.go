@@ -12,7 +12,7 @@ func HandleBroadcasterMessage(broadcaster *clients.Broadcaster, message *util.Me
 
 	switch message.Type {
 
-	case "code-diff":
+	case "code-state":
 		codesync.CodeSync(broadcaster, message)
 
 	default:

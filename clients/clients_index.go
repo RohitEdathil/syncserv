@@ -40,6 +40,7 @@ func (s *ClientsIndex) CreateNew() *Broadcaster {
 	s.data[id] = &Broadcaster{
 		Id:        id,
 		Secret:    uuid.NewString(),
+		Text:      "",
 		Lock:      &sync.Mutex{},
 		Listeners: map[int]Listener{},
 	}

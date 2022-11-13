@@ -25,6 +25,10 @@ func (listener *Listener) StartListening(conn *websocket.Conn) {
 	// Assign connection
 	listener.Lock.Lock()
 	listener.Connection = conn
+	listener.Connection.WriteJSON(util.Message{
+		Type: "code-state",
+		Data: listener.Of.Text,
+	})
 	listener.Lock.Unlock()
 
 	// Listen loop

@@ -15,6 +15,7 @@ import (
 type Broadcaster struct {
 	Id         string
 	Secret     string
+	Text       string
 	Connection *websocket.Conn
 	Lock       *sync.Mutex
 	Listeners  map[int]Listener
@@ -29,6 +30,10 @@ func (broadcaster *Broadcaster) StartListening(conn *websocket.Conn) {
 	// Assign connection
 	broadcaster.Lock.Lock()
 	broadcaster.Connection = conn
+	broadcaster.Connection.WriteJSON(util.Message{
+		Type: "code-state",
+		Data: broadcaster.Text,
+	})
 	broadcaster.Lock.Unlock()
 
 	// Listen loop
