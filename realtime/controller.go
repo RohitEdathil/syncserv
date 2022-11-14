@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 	e "syncserv/error_handling"
-	"syncserv/mapper"
+	"syncserv/handler"
 
 	"syncserv/clients"
 
@@ -44,8 +44,10 @@ func AttachController(ctx *gin.Context) {
 		e.PanicHTTP(e.BadRequest, err.Error())
 	}
 
-	// Assign handler
-	sharer.Handler = mapper.HandleBroadcasterMessage
+	// Assign handlers
+	sharer.ConnectedHandler = handler.HandleBroadcasterConnected
+	sharer.MessageHandler = handler.HandleBroadcasterMessage
+	sharer.DisconnectedHandler = handler.HandleBroadcasterDisconnected
 
 	go sharer.StartListening(connection)
 
@@ -88,7 +90,9 @@ func ListenController(ctx *gin.Context) {
 	sharer.AddListener(&listener)
 
 	// Assign handler
-	listener.Handler = mapper.HandleListenerMessage
+	listener.ConnectedHandler = handler.HandleListenerConnected
+	listener.MessageHandler = handler.HandleListenerMessage
+	listener.DisconnectedHandler = handler.HandleListenerDisconnected
 
 	go listener.StartListening(connection)
 

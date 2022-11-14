@@ -6,8 +6,7 @@ import (
 )
 
 // Syncs code of broadcaster to all listeners
-func CodeSync(broadcaster *clients.Broadcaster, message *util.Message) {
-	broadcaster.Lock.Lock()
+func CodeState(broadcaster *clients.Broadcaster, message *util.Message) {
 	broadcaster.Text = message.Data
 	// Broadcast message to all listeners
 	for _, listener := range broadcaster.Listeners {
@@ -16,5 +15,18 @@ func CodeSync(broadcaster *clients.Broadcaster, message *util.Message) {
 		listener.Lock.Unlock()
 	}
 
-	broadcaster.Lock.Unlock()
+}
+
+func SendSavedStateB(broadcaster *clients.Broadcaster) {
+	broadcaster.Connection.WriteJSON(util.Message{
+		Type: "code-state",
+		Data: broadcaster.Text,
+	})
+}
+
+func SendSavedStateL(listener *clients.Listener) {
+	listener.Connection.WriteJSON(util.Message{
+		Type: "code-state",
+		Data: listener.Of.Text,
+	})
 }

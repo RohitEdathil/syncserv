@@ -16,7 +16,9 @@ type Listener struct {
 	Connection *websocket.Conn
 	Lock       *sync.Mutex
 
-	Handler func(listener *Listener, message *util.Message)
+	ConnectedHandler    func(listener *Listener)
+	MessageHandler      func(listener *Listener, message *util.Message)
+	DisconnectedHandler func(listener *Listener)
 }
 
 // Creates a new listener
@@ -25,11 +27,9 @@ func (listener *Listener) StartListening(conn *websocket.Conn) {
 	// Assign connection
 	listener.Lock.Lock()
 	listener.Connection = conn
-	listener.Connection.WriteJSON(util.Message{
-		Type: "code-state",
-		Data: listener.Of.Text,
-	})
 	listener.Lock.Unlock()
+
+	listener.ConnectedHandler(listener)
 
 	// Listen loop
 	for {
@@ -48,13 +48,13 @@ func (listener *Listener) StartListening(conn *websocket.Conn) {
 
 		// Handling message
 		log.Printf("Message received from %s", listener.Connection.RemoteAddr())
-		listener.Handler(listener, &message)
+		listener.MessageHandler(listener, &message)
 	}
 
 	// Broadcast disconnection
 	log.Printf("Disconnected")
 
-	listener.Of.RemoveListener(listener)
+	listener.DisconnectedHandler(listener)
 
 	listener.Lock.Lock()
 	listener.Connection = nil

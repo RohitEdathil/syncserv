@@ -21,7 +21,9 @@ type Broadcaster struct {
 	Listeners  map[int]Listener
 	count      int
 
-	Handler func(broadcaster *Broadcaster, message *util.Message)
+	ConnectedHandler    func(broadcaster *Broadcaster)
+	MessageHandler      func(broadcaster *Broadcaster, message *util.Message)
+	DisconnectedHandler func(broadcaster *Broadcaster)
 }
 
 // Starts listening to messages from the broadcaster
@@ -30,11 +32,9 @@ func (broadcaster *Broadcaster) StartListening(conn *websocket.Conn) {
 	// Assign connection
 	broadcaster.Lock.Lock()
 	broadcaster.Connection = conn
-	broadcaster.Connection.WriteJSON(util.Message{
-		Type: "code-state",
-		Data: broadcaster.Text,
-	})
 	broadcaster.Lock.Unlock()
+
+	broadcaster.ConnectedHandler(broadcaster)
 
 	// Listen loop
 	for {
@@ -51,21 +51,17 @@ func (broadcaster *Broadcaster) StartListening(conn *websocket.Conn) {
 
 		// Handling message
 		log.Printf("Message received from %s", broadcaster.Connection.RemoteAddr())
-		broadcaster.Handler(broadcaster, &message)
+		broadcaster.MessageHandler(broadcaster, &message)
 	}
 
 	// Broadcast disconnection
 	log.Printf("Disconnected")
 
+	broadcaster.DisconnectedHandler(broadcaster)
+
 	broadcaster.Lock.Lock()
 	broadcaster.Connection = nil
 	broadcaster.Lock.Unlock()
-
-	// Remove broadcaster from list if no more listeners
-	if len(broadcaster.Listeners) == 0 {
-		log.Printf("No more listeners, closing broadcaster")
-		ClientIndexInstance.Delete(broadcaster.Id)
-	}
 
 }
 
