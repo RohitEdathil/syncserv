@@ -15,6 +15,7 @@ type Listener struct {
 	Of         *Broadcaster
 	Connection *websocket.Conn
 	Lock       *sync.Mutex
+	GreenFlag  bool
 
 	ConnectedHandler    func(listener *Listener)
 	MessageHandler      func(listener *Listener, message *util.Message)
@@ -22,6 +23,16 @@ type Listener struct {
 }
 
 // Creates a new listener
+func NewListener(of *Broadcaster, connection *websocket.Conn) *Listener {
+	return &Listener{
+		Of:         of,
+		Connection: connection,
+		Lock:       &sync.Mutex{},
+		GreenFlag:  true,
+	}
+}
+
+// Starts listening for messages from the listener
 func (listener *Listener) StartListening(conn *websocket.Conn) {
 
 	// Assign connection

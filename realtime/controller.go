@@ -2,7 +2,6 @@ package realtime
 
 import (
 	"log"
-	"sync"
 	e "syncserv/error_handling"
 	"syncserv/handler"
 
@@ -81,13 +80,9 @@ func ListenController(ctx *gin.Context) {
 	}
 
 	// Create a new listener
-	listener := clients.Listener{
-		Of:         sharer,
-		Connection: connection,
-		Lock:       &sync.Mutex{},
-	}
+	listener := clients.NewListener(sharer, connection)
 
-	sharer.AddListener(&listener)
+	sharer.AddListener(listener)
 
 	// Assign handler
 	listener.ConnectedHandler = handler.HandleListenerConnected
