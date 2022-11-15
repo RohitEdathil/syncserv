@@ -4,12 +4,14 @@ import (
 	"syncserv/clients"
 	"syncserv/codesync"
 	e "syncserv/error_handling"
+	"syncserv/flag"
 	"syncserv/util"
 )
 
 func HandleListenerConnected(listener *clients.Listener) {
 	listener.Lock.Lock()
 	codesync.SendSavedStateL(listener)
+	flag.ListenerConnected(listener)
 	listener.Lock.Unlock()
 }
 
@@ -18,6 +20,9 @@ func HandleListenerMessage(listener *clients.Listener, message *util.Message) {
 
 	listener.Lock.Lock()
 	switch message.Type {
+
+	case "flag-switch":
+		flag.ListenerFlagSwitched(listener)
 
 	default:
 		e.PanicWS(*listener.Connection, "Invalid message type")
@@ -29,5 +34,6 @@ func HandleListenerMessage(listener *clients.Listener, message *util.Message) {
 func HandleListenerDisconnected(listener *clients.Listener) {
 	listener.Lock.Lock()
 	listener.Of.RemoveListener(listener)
+	flag.ListenerDisconnected(listener)
 	listener.Lock.Unlock()
 }

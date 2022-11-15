@@ -20,6 +20,7 @@ type Broadcaster struct {
 	Lock       *sync.Mutex
 	Listeners  map[int]Listener
 	count      int
+	GreenCount int
 
 	ConnectedHandler    func(broadcaster *Broadcaster)
 	MessageHandler      func(broadcaster *Broadcaster, message *util.Message)

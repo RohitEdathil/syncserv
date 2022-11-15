@@ -5,12 +5,14 @@ import (
 	"syncserv/clients"
 	"syncserv/codesync"
 	e "syncserv/error_handling"
+	"syncserv/flag"
 	"syncserv/util"
 )
 
 func HandleBroadcasterConnected(broadcaster *clients.Broadcaster) {
 	broadcaster.Lock.Lock()
 	codesync.SendSavedStateB(broadcaster)
+	flag.SendCounts(broadcaster)
 	broadcaster.Lock.Unlock()
 }
 
