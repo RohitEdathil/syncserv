@@ -6,9 +6,6 @@ import (
 	"time"
 )
 
-const PURGE_LOOP_INTERVAL = 10 * time.Second
-const PURGE_TIMEOUT = 10 * time.Second
-
 func PurgeLoop() {
 
 	for {
