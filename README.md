@@ -8,6 +8,6 @@ This repo contains the backend code.
 
 ## Features
 
-- Broadcast code from a broadcaster to multiple listeners ✅
-- Broadcaster can see how many listeners are connected ❌
-- A red-flag, green-flag system to let the broadcaster know if the listeners are able to follow along ❌
+- Broadcast code from a broadcaster to multiple listeners
+- Broadcaster can see how many listeners are connected
+- A red-flag, green-flag system to let the broadcaster know if the listeners are able to follow along
