@@ -25,7 +25,7 @@ func HandleListenerMessage(listener *clients.Listener, message *util.Message) {
 		flag.ListenerFlagSwitched(listener)
 
 	default:
-		e.PanicWS(*listener.Connection, "Invalid message type")
+		e.PanicWS(listener.Connection, "Invalid message type")
 	}
 	listener.Lock.Unlock()
 

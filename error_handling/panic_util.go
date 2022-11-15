@@ -24,9 +24,9 @@ func PanicHTTP(code int, message string) {
 }
 
 // Utility function for panicking with WebSocketError
-func PanicWS(ws websocket.Conn, message string) {
+func PanicWS(ws *websocket.Conn, message string) {
 
-	if &ws == nil {
+	if ws == nil {
 		return
 	}
 

@@ -27,7 +27,7 @@ func HandleBroadcasterMessage(broadcaster *clients.Broadcaster, message *util.Me
 		codesync.CodeState(broadcaster, message)
 
 	default:
-		e.PanicWS(*broadcaster.Connection, "Invalid message type")
+		e.PanicWS(broadcaster.Connection, "Invalid message type")
 	}
 	broadcaster.Lock.Unlock()
 

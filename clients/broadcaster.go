@@ -47,7 +47,7 @@ func (broadcaster *Broadcaster) StartListening(conn *websocket.Conn) {
 
 		// Error handling
 		if err != nil {
-			e.PanicWS(*broadcaster.Connection, err.Error())
+			e.PanicWS(broadcaster.Connection, err.Error())
 			broadcaster.Connection.Close()
 			break
 		}

@@ -51,7 +51,7 @@ func (listener *Listener) StartListening(conn *websocket.Conn) {
 		// Error handling
 		if err != nil {
 			listener.Lock.Lock()
-			e.PanicWS(*listener.Connection, err.Error())
+			e.PanicWS(listener.Connection, err.Error())
 			listener.Lock.Unlock()
 			listener.Connection.Close()
 			break
