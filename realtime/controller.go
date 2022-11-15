@@ -44,9 +44,11 @@ func AttachController(ctx *gin.Context) {
 	}
 
 	// Assign handlers
+	sharer.Lock.Lock()
 	sharer.ConnectedHandler = handler.HandleBroadcasterConnected
 	sharer.MessageHandler = handler.HandleBroadcasterMessage
 	sharer.DisconnectedHandler = handler.HandleBroadcasterDisconnected
+	sharer.Lock.Unlock()
 
 	go sharer.StartListening(connection)
 
@@ -85,9 +87,11 @@ func ListenController(ctx *gin.Context) {
 	sharer.AddListener(listener)
 
 	// Assign handler
+	listener.Lock.Lock()
 	listener.ConnectedHandler = handler.HandleListenerConnected
 	listener.MessageHandler = handler.HandleListenerMessage
 	listener.DisconnectedHandler = handler.HandleListenerDisconnected
+	listener.Lock.Unlock()
 
 	go listener.StartListening(connection)
 

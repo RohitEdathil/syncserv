@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"log"
 	"syncserv/clients"
 	"syncserv/codesync"
 	e "syncserv/error_handling"
 	"syncserv/flag"
+	"syncserv/purger"
 	"syncserv/util"
 )
 
@@ -13,6 +13,7 @@ func HandleBroadcasterConnected(broadcaster *clients.Broadcaster) {
 	broadcaster.Lock.Lock()
 	codesync.SendSavedStateB(broadcaster)
 	flag.SendCounts(broadcaster)
+	purger.ClearLastSeen(broadcaster)
 	broadcaster.Lock.Unlock()
 }
 
@@ -34,10 +35,6 @@ func HandleBroadcasterMessage(broadcaster *clients.Broadcaster, message *util.Me
 
 func HandleBroadcasterDisconnected(broadcaster *clients.Broadcaster) {
 	broadcaster.Lock.Lock()
-	// Remove broadcaster from list if no more listeners
-	if len(broadcaster.Listeners) == 0 {
-		log.Printf("No more listeners, closing broadcaster")
-		clients.ClientIndexInstance.Delete(broadcaster.Id)
-	}
+	purger.MarkLastSeen(broadcaster)
 	broadcaster.Lock.Unlock()
 }

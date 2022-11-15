@@ -1,8 +1,10 @@
 package clients
 
 import (
+	"log"
 	"sync"
 	"syncserv/util"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -21,7 +23,9 @@ var ClientIndexInstance = ClientsIndex{0, make(map[string]*Broadcaster), &sync.M
 func (s *ClientsIndex) uniqueId() string {
 	id := util.RandString(5)
 
+	s.Lock.Lock()
 	_, ok := s.data[id]
+	s.Lock.Unlock()
 
 	if ok {
 		return s.uniqueId()
@@ -43,6 +47,7 @@ func (s *ClientsIndex) CreateNew() *Broadcaster {
 		Text:      "",
 		Lock:      &sync.Mutex{},
 		Listeners: map[int]Listener{},
+		LastSeen:  time.Now(),
 	}
 	s.Count++
 	s.Lock.Unlock()
@@ -71,5 +76,38 @@ func (s *ClientsIndex) Delete(id string) {
 	s.Lock.Lock()
 	delete(s.data, id)
 	s.Count--
+	s.Lock.Unlock()
+}
+
+// Purges all the TypeSyncs that have not been seen in a while
+func (s *ClientsIndex) Purge(while time.Duration) {
+	s.Lock.Lock()
+	for id, sharer := range s.data {
+
+		sharer.Lock.Lock()
+		// Don't purge if it's been seen within the while duration
+		if !(time.Since(sharer.LastSeen) > while) {
+			sharer.Lock.Unlock()
+			continue
+		}
+
+		// Don't purge if there are still listeners
+		if !(len(sharer.Listeners) == 0) {
+			sharer.Lock.Unlock()
+			continue
+		}
+
+		// Don't purge if it's still connected
+		if sharer.LastSeen == (time.Time{}) {
+			sharer.Lock.Unlock()
+			continue
+		}
+		sharer.Lock.Unlock()
+
+		// Purge
+		log.Printf("Purged %s", id)
+		delete(s.data, id)
+		s.Count--
+	}
 	s.Lock.Unlock()
 }

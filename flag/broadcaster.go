@@ -9,6 +9,11 @@ import (
 // Sends total and green flag counts
 func SendCounts(broadcaster *clients.Broadcaster) {
 
+	// Skip if broadcaster is not connected
+	if broadcaster.Connection == nil {
+		return
+	}
+
 	broadcaster.Connection.WriteJSON(util.Message{
 		Type: "flag-count",
 		Data: fmt.Sprint(len(broadcaster.Listeners)),

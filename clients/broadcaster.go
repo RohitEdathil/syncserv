@@ -3,6 +3,7 @@ package clients
 import (
 	"log"
 	"sync"
+	"time"
 
 	e "syncserv/error_handling"
 
@@ -21,6 +22,7 @@ type Broadcaster struct {
 	Listeners  map[int]Listener
 	count      int
 	GreenCount int
+	LastSeen   time.Time
 
 	ConnectedHandler    func(broadcaster *Broadcaster)
 	MessageHandler      func(broadcaster *Broadcaster, message *util.Message)
